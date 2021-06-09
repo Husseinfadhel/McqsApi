@@ -36,9 +36,10 @@ class Grade(Base):
 
 
 class Semesters(Base):
+    __tablename__ = 'Semesters'
     id = Column(Integer, primary_key=True)
     num = Column(Integer)
-    grade_id = Column(Integer, ForeignKey='Grade.id')
+    grade_id = Column(Integer, ForeignKey('Grade.id'))
     modules = relationship('Modules')
 
     def __init__(self, num, grade_id):
@@ -65,10 +66,11 @@ class Semesters(Base):
 
 
 class Modules(Base):
+    __tablename__ = 'Modules'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
-    grade_id = Column(Integer, ForeignKey='Grade.id')
-    semester_id = Column(Integer, ForeignKey='Semesters.id')
+    grade_id = Column(Integer, ForeignKey('Grade.id'))
+    semester_id = Column(Integer, ForeignKey('Semesters.id'))
     mcqs = relationship('Mcqs')
 
     def __init__(self, name, grade_id, semester_id):
@@ -97,15 +99,16 @@ class Modules(Base):
 
 
 class Mcqs(Base):
+    __tablename__ = 'Mcqs'
     id = Column(Integer, primary_key=True)
-    question = Column(String, nullable=False)
-    choice_A = Column(String, nullable=False)
-    choice_B = Column(String, nullable=False)
-    choice_C = Column(String, nullable=False)
-    choice_D = Column(String, nullable=False)
-    choice_E = Column(String)
-    answer = Column(String, nullable=False)
-    module_id = Column(Integer, ForeignKey='Modules.id')
+    question = Column(String(255), nullable=False)
+    choice_A = Column(String(255), nullable=False)
+    choice_B = Column(String(255), nullable=False)
+    choice_C = Column(String(255), nullable=False)
+    choice_D = Column(String(255), nullable=False)
+    choice_E = Column(String(255))
+    answer = Column(String(255), nullable=False)
+    module_id = Column(Integer, ForeignKey('Modules.id'))
 
     def __init__(self, question, choice_A, choice_B, choice_C, choice_D, choice_E, answer, module_id):
         self.question = question
@@ -143,4 +146,4 @@ class Mcqs(Base):
             }
 
 
-Base.metadata.create_all(engine)
+
