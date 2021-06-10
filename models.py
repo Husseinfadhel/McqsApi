@@ -1,10 +1,12 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
-import pymysql
 
 engine = create_engine('mysql+pymysql://root:@localhost/foo', echo=True)
 Base = declarative_base()
-Session = sessionmaker(engine)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = SessionLocal()
+
 
 class Grade(Base):
     __tablename__ = 'Grade'
@@ -144,6 +146,3 @@ class Mcqs(Base):
                 'module_id': self.module_id
 
             }
-
-
-
