@@ -1,6 +1,6 @@
 import uvicorn as uvicorn
 from fastapi import FastAPI
-from models import Grade, Semesters, Modules, Mcqs, Base, engine, session
+from models import Grade, Semesters, Modules, Mcqs, Base, engine, session, conn
 
 app = FastAPI()
 
@@ -16,9 +16,6 @@ def grade():
 
 @app.post('/grade/add/<stage>')
 def grade_add(stage):
-    grade_create = Grade(stage=Grade.stage)
-    Grade.insert(grade_create)
-    session.commit()
-    session.close()
-    return Grade.insert(grade_create)
+    return conn.execute('INSERT INTO Grade (stage) VALUES ({})'.format(stage))
+
 
