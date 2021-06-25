@@ -21,15 +21,15 @@ class Grade(Base):
         self.stage = stage
 
     def insert(self):
-        Session.add(self)
-        Session.commit()
+        session.add(self)
+        session.commit()
 
     def delete(self):
-        Session.delete(self)
-        Session.commit(self)
+        session.delete(self)
+        session.commit(self)
 
     def update(self):
-        Session.commit()
+        session.commit()
 
     def format(self):
         return {
@@ -50,15 +50,15 @@ class Semesters(Base):
         self.grade_id = grade_id
 
     def insert(self):
-        Session.add(self)
-        Session.commit()
+        session.add(self)
+        session.commit()
 
     def delete(self):
-        Session.delete(self)
-        Session.commit(self)
+        session.delete(self)
+        session.commit(self)
 
     def update(self):
-        Session.commit()
+        session.commit()
 
     def format(self):
         return {
@@ -82,15 +82,15 @@ class Modules(Base):
         self.semester_id = semester_id
 
     def insert(self):
-        Session.add(self)
-        Session.commit()
+        session.add(self)
+        session.commit()
 
     def delete(self):
-        Session.delete(self)
-        Session.commit(self)
+        session.delete(self)
+        session.commit(self)
 
     def update(self):
-        Session.commit()
+        session.commit()
 
     def format(self):
         return {
@@ -124,15 +124,15 @@ class Mcqs(Base):
         self.module_id = module_id
 
         def insert(self):
-            Session.add(self)
-            Session.commit()
+            session.add(self)
+            session.commit()
 
         def delete(self):
-            Session.delete(self)
-            Session.commit(self)
+            session.delete(self)
+            session.commit(self)
 
         def update(self):
-            Session.commit()
+            session.commit()
 
         def format(self):
             return {
