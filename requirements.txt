@@ -22,7 +22,6 @@ cycler==0.10.0
 dbus-python==1.2.16
 decorator==4.4.2
 defusedxml==0.6.0
-dhcpig==0.0.0
 dicttoxml==1.7.4
 distro==1.5.0
 distro-info===0.23ubuntu1
