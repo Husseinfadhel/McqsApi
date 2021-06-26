@@ -32,8 +32,6 @@ entrypoints==0.3
 fastapi==0.65.2
 feedparser==5.2.1
 flasgger==0.9.4
-Flask==1.1.2
-Flask-RESTful==0.3.8
 future==0.18.2
 gpg===1.14.0-unknown
 greenlet==1.1.0
@@ -56,7 +54,6 @@ ipywidgets==6.0.0
 itsdangerous==1.1.0
 jedi==0.17.0
 jeepney==0.4.3
-Jinja2==2.11.2
 jsonschema==3.2.0
 jupyter-client==6.1.6
 jupyter-core==4.6.3
