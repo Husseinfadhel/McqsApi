@@ -5,7 +5,6 @@ attrs==19.3.0
 backcall==0.2.0
 bcrypt==3.1.7
 beautifulsoup4==4.9.3
-binwalk==2.2.0
 bleach==3.2.1
 blinker==1.4
 Brotli==1.0.9
