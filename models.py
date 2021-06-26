@@ -6,7 +6,6 @@ Base = declarative_base()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
-conn = engine.connect()
 
 
 class Grade(Base):
@@ -109,32 +108,30 @@ class Mcqs(Base):
     choice_B = Column(String(255), nullable=False)
     choice_C = Column(String(255), nullable=False)
     choice_D = Column(String(255), nullable=False)
-    choice_E = Column(String(255))
     answer = Column(String(255), nullable=False)
     module_id = Column(Integer, ForeignKey('Modules.id'))
 
-    def __init__(self, question, choice_A, choice_B, choice_C, choice_D, choice_E, answer, module_id):
+    def __init__(self, question, choice_A, choice_B, choice_C, choice_D, answer, module_id):
         self.question = question
         self.choice_A = choice_A
         self.choice_B = choice_B
         self.choice_C = choice_C
         self.choice_D = choice_D
-        self.choice_E = choice_E
         self.answer = answer
         self.module_id = module_id
 
-        def insert(self):
+    def insert(self):
             session.add(self)
             session.commit()
 
-        def delete(self):
+    def delete(self):
             session.delete(self)
             session.commit(self)
 
-        def update(self):
+    def update(self):
             session.commit()
 
-        def format(self):
+    def format(self):
             return {
                 'id': self.id,
                 'question': self.question,
@@ -142,7 +139,6 @@ class Mcqs(Base):
                 'choice_B': self.choice_B,
                 'choice_C': self.choice_C,
                 'choice_D': self.choice_D,
-                'choice_E': self.choice_E,
                 'answer': self.answer,
                 'module_id': self.module_id
 
