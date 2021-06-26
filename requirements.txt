@@ -31,7 +31,6 @@ fastapi==0.65.2
 feedparser==5.2.1
 flasgger==0.9.4
 future==0.18.2
-gpg===1.14.0-unknown
 greenlet==1.1.0
 h11==0.9.0
 h2==3.2.0
