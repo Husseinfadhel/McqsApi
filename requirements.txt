@@ -52,18 +52,6 @@ itsdangerous==1.1.0
 jedi==0.17.0
 jeepney==0.4.3
 jsonschema==3.2.0
-jupyter-client==6.1.6
-jupyter-core==4.6.3
-k4c @ file:///home/krvhrv/katoolin4china
-kaitaistruct==0.8
-keyring==21.3.0
-kiwisolver==1.2.0
-language-selector==0.1
-launchpadlib==1.10.13
-lazr.restfulclient==0.14.2
-lazr.uri==1.0.5
-ldap3==2.7
-ldapdomaindump==0.9.3
 lxml==4.5.2
 MarkupSafe==1.1.1
 matplotlib==3.3.0
