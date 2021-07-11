@@ -1,7 +1,7 @@
 from sqlalchemy import *
 from sqlalchemy.orm import *
 
-engine = create_engine('mysql+pymysql://root:toor@localhost:3306/foo', echo=True)
+engine = create_engine('mysql+pymysql://root@localhost:3306/test', echo=True)
 Base = declarative_base()
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
