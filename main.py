@@ -2,12 +2,12 @@ from fastapi import FastAPI, Depends, Security
 from pydantic import BaseModel
 from models import Grade, Semesters, Modules, Mcqs, Base, engine, session
 from fastapi_auth0 import Auth0, Auth0User
-import os
+
 
 app = FastAPI()
 Base.metadata.create_all(engine)
 
-auth = Auth0(domain='alamjad.eu.auth0.com', api_audience='bmcapi', scopes={})
+auth = Auth0(domain='bmcapi.jp.auth0.com', api_audience='bmcapi.jp-auth0.com', scopes={'read:users': 'create & edit mcqs'})
 
 
 class Grad(BaseModel):
@@ -57,11 +57,11 @@ class Moc(BaseModel):
 def grade():
     query = session.query(Grade).all()
     print(query)
-    return 200, {'Response': 'OK',  'Grades': query}
+    return 200, {'Response': 'OK', 'Grades': query}
 
 
 @app.post('/grade/add', dependencies=[Depends(auth.implicit_scheme)])
-def grade_add(grad: Grad, user: Auth0User = Security(auth.get_user)):
+def grade_add(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     new = Grade(stage=grad.stage)
     Grade.insert(new)
     return 201, {'Response': 'OK', 'User': user}
@@ -75,7 +75,7 @@ def semesters():
 
 
 @app.post('/semesters/add/', dependencies=[Depends(auth.implicit_scheme)])
-def grade_add(seme: Sem, user: Auth0User = Security(auth.get_user)):
+def grade_add(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     new = Semesters(num=seme.seme, grade_id=seme.grade_id)
     Semesters.insert(new)
     return 201, {'Response': 'OK'}
@@ -88,14 +88,14 @@ def mod():
 
 
 @app.post("/Module/add", dependencies=[Depends(auth.implicit_scheme)])
-def modul(model: Mo, user: Auth0User = Security(auth.get_user)):
+def modul(model: Mo, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     new = Modules(name=model.name, grade_id=model.grade_id, semester_id=model.semester_id)
     Modules.insert(new)
     return 201, {'Response': 'OK'}
 
 
 @app.put("/Module/edit", dependencies=[Depends(auth.implicit_scheme)])
-def upd(umod: Umo, user: Auth0User = Security(auth.get_user)):
+def upd(umod: Umo, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     n = session.query(Modules).get(umod.module_id)
     n.name = umod.module_name
     n.grade_id = umod.grade_id
@@ -111,7 +111,7 @@ def mcqs():
 
 
 @app.post('/mcqs/add', dependencies=[Depends(auth.implicit_scheme)])
-def mcq_add(mcq: Mcq, user: Auth0User = Security(auth.get_user)):
+def mcq_add(mcq: Mcq, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     new = Mcqs(question=mcq.question, choice_A=mcq.choice_A, choice_B=mcq.choice_B, choice_C=mcq.choice_C,
                choice_D=mcq.choice_D, answer=mcq.answer, module_id=mcq.module_id)
     Mcqs.insert(new)
@@ -119,7 +119,7 @@ def mcq_add(mcq: Mcq, user: Auth0User = Security(auth.get_user)):
 
 
 @app.put('/mcqs/edit', dependencies=[Depends(auth.implicit_scheme)])
-def mcq_edit(edo: Moc, user: Auth0User = Security(auth.get_user)):
+def mcq_edit(edo: Moc, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     mcc = session.query(Mcqs).get(edo.mcq_id)
     mcc.question = edo.question
     mcc.choice_A = edo.choice_A
