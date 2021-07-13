@@ -79,7 +79,7 @@ def grade_add(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['re
 
 
 @app.delete('/grade/delete')
-def gd_delete(grad: Grad):
+def gd_delete(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     session.query(Grade).filter_by(id=grad.id).delete()
     session.commit()
     return 205, {'Response': 'OK'}
@@ -99,8 +99,8 @@ def grade_add(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['rea
     return 201, {'Response': 'OK'}
 
 
-@app.delete('/semesters/delete/')
-def sem_delete(seme: Sem):
+@app.delete('/semesters/delete/', dependencies=[Depends(auth.implicit_scheme)])
+def sem_delete(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     session.query(Semesters).filter_by(id=seme.id).delete()
     session.commit()
     return 205, {'Response': 'OK'}
@@ -129,8 +129,8 @@ def upd(umod: Umo, user: Auth0User = Security(auth.get_user), scopes=['read:user
     return 204, {'Response': 'OK'}
 
 
-@app.delete("/Module/delete/")
-def mod_del(mode: Dmo):
+@app.delete("/Module/delete/", dependencies=[Depends(auth.implicit_scheme)])
+def mod_del(mode: Dmo, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     session.query(Modules).filter_by(id=mode.id).delete()
     session.commit()
     return 204, {'Response': 'OK'}
@@ -164,8 +164,8 @@ def mcq_edit(edo: Moc, user: Auth0User = Security(auth.get_user), scopes=['read:
     return 204, {'Response': 'OK'}
 
 
-@app.delete('/mcq/delete')
-def mcq_dele(mcq: Mcqd):
+@app.delete('/mcq/delete', dependencies=[Depends(auth.implicit_scheme)])
+def mcq_dele(mcq: Mcqd, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
     session.query(Mcqs).filter_by(id=mcq.id).delete()
     session.commit()
     return 204, {'Response': 'OK'}
