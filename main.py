@@ -3,26 +3,29 @@ from pydantic import BaseModel
 from models import Grade, Semesters, Modules, Mcqs, Base, engine, session
 from fastapi_auth0 import Auth0, Auth0User
 
-
 app = FastAPI()
 Base.metadata.create_all(engine)
 
-auth = Auth0(domain='bmcapi.jp.auth0.com', api_audience='bmcapi.jp-auth0.com', scopes={'read:users': 'create & edit mcqs'})
+auth = Auth0(domain='bmcapi.jp.auth0.com', api_audience='bmcapi.jp-auth0.com',
+             scopes={'read:users': 'create & edit mcqs'})
 
 
 class Grad(BaseModel):
     stage: int
+    id: int
 
 
 class Sem(BaseModel):
     seme: int
     grade_id: int
+    id: int
 
 
 class Mo(BaseModel):
     name: str
     grade_id: int
     semester_id: int
+    id: int
 
 
 class Mcq(BaseModel):
@@ -35,11 +38,19 @@ class Mcq(BaseModel):
     module_id: int
 
 
+class Mcqd(BaseModel):
+    id: int
+
+
 class Umo(BaseModel):
     grade_id: int
     semester_id: int
     module_id: int
     module_name: str
+
+
+class Dmo(BaseModel):
+    id: int
 
 
 class Moc(BaseModel):
@@ -67,6 +78,13 @@ def grade_add(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['re
     return 201, {'Response': 'OK', 'User': user}
 
 
+@app.delete('/grade/delete')
+def gd_delete(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
+    session.query(Grade).filter_by(id=grad.id).delete()
+    session.commit()
+    return 205, {'Response': 'OK'}
+
+
 @app.get('/semesters')
 def semesters():
     query = session.query(Semesters).all()
@@ -79,6 +97,13 @@ def grade_add(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['rea
     new = Semesters(num=seme.seme, grade_id=seme.grade_id)
     Semesters.insert(new)
     return 201, {'Response': 'OK'}
+
+
+@app.delete('/semesters/delete/', dependencies=[Depends(auth.implicit_scheme)])
+def sem_delete(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
+    session.query(Semesters).filter_by(id=seme.id).delete()
+    session.commit()
+    return 205, {'Response': 'OK'}
 
 
 @app.get('/Modules')
@@ -104,7 +129,14 @@ def upd(umod: Umo, user: Auth0User = Security(auth.get_user), scopes=['read:user
     return 204, {'Response': 'OK'}
 
 
-@app.get('/mcqs')
+@app.delete("/Module/delete/", dependencies=[Depends(auth.implicit_scheme)])
+def mod_del(mode: Dmo, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
+    session.query(Modules).filter_by(id=mode.id).delete()
+    session.commit()
+    return 204, {'Response': 'OK'}
+
+
+@app.get('/mcqs/')
 def mcqs():
     quer = session.query(Mcqs).all()
     return 200, {'Response': 'OK', 'Mcqs': quer}
@@ -129,4 +161,11 @@ def mcq_edit(edo: Moc, user: Auth0User = Security(auth.get_user), scopes=['read:
     mcc.answer = edo.answer
     mcc.module_id = edo.module_id
     Mcqs.update(mcc)
+    return 204, {'Response': 'OK'}
+
+
+@app.delete('/mcq/delete', dependencies=[Depends(auth.implicit_scheme)])
+def mcq_dele(mcq: Mcqd, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
+    session.query(Mcqs).filter_by(id=mcq.id).delete()
+    session.commit()
     return 204, {'Response': 'OK'}
