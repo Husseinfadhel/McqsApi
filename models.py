@@ -1,145 +1,68 @@
-from sqlalchemy import *
-from sqlalchemy.orm import *
+from bson import ObjectId
+from pymongo import *
+from pydantic import *
+from typing import *
 
-engine = create_engine('mysql+pymysql://daqgdip0249iio24:ecye9zxugb47b32f@f80b6byii2vwv8cx.chr7pe7iynqr.eu-west-1.rds.amazonaws.com:3306/d34gvz2o28p2zcdu', echo=True)
-Base = declarative_base()
+client = MongoClient("mongodb://127.0.0.1:27017/?readPreference=primary")
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-session = SessionLocal()
-
-
-class Grade(Base):
-    __tablename__ = 'Grade'
-
-    id = Column(Integer(), primary_key=True)
-    stage = Column(Integer())
-    semesters = relationship('Semesters')
-    modules = relationship('Modules')
-
-    def __init__(self, stage):
-        self.stage = stage
-
-    def insert(self):
-        session.add(self)
-        session.commit()
-
-    def delete(self):
-        session.delete(self)
-        session.commit(self)
-
-    def update(self):
-        session.commit()
-
-    def format(self):
-        return {
-            'id': self.id,
-            'stage': self.stage
-        }
+db = client.users
+collection = db.get_collection('mcq')
 
 
-class Semesters(Base):
-    __tablename__ = 'Semesters'
-    id = Column(Integer, primary_key=True)
-    num = Column(Integer)
-    grade_id = Column(Integer, ForeignKey('Grade.id'))
-    modules = relationship('Modules')
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
-    def __init__(self, num, grade_id):
-        self.num = num
-        self.grade_id = grade_id
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
+        return ObjectId(v)
 
-    def insert(self):
-        session.add(self)
-        session.commit()
-
-    def delete(self):
-        session.delete(self)
-        session.commit(self)
-
-    def update(self):
-        session.commit()
-
-    def format(self):
-        return {
-            'id': self.id,
-            'grade_id': self.grade_id,
-            'sem_num': self.num
-        }
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
 
 
-class Modules(Base):
-    __tablename__ = 'Modules'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
-    grade_id = Column(Integer, ForeignKey('Grade.id'))
-    semester_id = Column(Integer, ForeignKey('Semesters.id'))
-    mcqs = relationship('Mcqs')
+class McqModel(BaseModel):
+    id: int = Field(default_factory=PyObjectId, alias="_id")
+    Grade: int = Field()
+    Semesters: int = Field()
+    Modules: str = Field()
+    Question: str = Field()
+    Choice_A: str = Field()
+    Choice_B: str = Field()
+    Choice_C: str = Field()
+    Choice_D: str = Field()
+    Choice_E: Optional[str] = Field()
+    Answer: str = Field()
 
-    def __init__(self, name, grade_id, semester_id):
-        self.name = name
-        self.grade_id = grade_id
-        self.semester_id = semester_id
-
-    def insert(self):
-        session.add(self)
-        session.commit()
-
-    def delete(self):
-        session.delete(self)
-        session.commit(self)
-
-    def update(self):
-        session.commit()
-
-    def format(self):
-        return {
-            'id': self.id,
-            'grade_id': self.grade_id,
-            'sem_id': self.semester_id,
-            'module': self.name
-        }
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
 
 
-class Mcqs(Base):
-    __tablename__ = 'Mcqs'
-    id = Column(Integer, primary_key=True)
-    question = Column(String(255), nullable=False)
-    choice_A = Column(String(255), nullable=False)
-    choice_B = Column(String(255), nullable=False)
-    choice_C = Column(String(255), nullable=False)
-    choice_D = Column(String(255), nullable=False)
-    answer = Column(String(255), nullable=False)
-    module_id = Column(Integer, ForeignKey('Modules.id'))
+class McqModelUpdate(BaseModel):
+    id: int = Field(default_factory=PyObjectId, alias="_id")
+    Grade: Optional[int] = Field()
+    Semesters: Optional[int] = Field()
+    Modules: Optional[str] = Field()
+    Question: Optional[str] = Field()
+    Choice_A: Optional[str] = Field()
+    Choice_B: Optional[str] = Field()
+    Choice_C: Optional[str] = Field()
+    Choice_D: Optional[str] = Field()
+    Choice_E: Optional[str] = Field()
+    Answer: Optional[str] = Field()
 
-    def __init__(self, question, choice_A, choice_B, choice_C, choice_D, answer, module_id):
-        self.question = question
-        self.choice_A = choice_A
-        self.choice_B = choice_B
-        self.choice_C = choice_C
-        self.choice_D = choice_D
-        self.answer = answer
-        self.module_id = module_id
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
 
-    def insert(self):
-            session.add(self)
-            session.commit()
 
-    def delete(self):
-            session.delete(self)
-            session.commit(self)
+class GetModule(BaseModel):
+    Grade: int
+    Semester: int
+    Module: Optional[str]
 
-    def update(self):
-            session.commit()
-
-    def format(self):
-            return {
-                'id': self.id,
-                'question': self.question,
-                'choice_A': self.choice_A,
-                'choice_B': self.choice_B,
-                'choice_C': self.choice_C,
-                'choice_D': self.choice_D,
-                'answer': self.answer,
-                'module_id': self.module_id
-
-            }

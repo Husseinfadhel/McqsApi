@@ -1,115 +1,33 @@
 from fastapi import FastAPI, Depends, Security
-from pydantic import BaseModel
-from models import Grade, Semesters, Modules, Mcqs, Base, engine, session
+from pydantic import *
+from models import McqModel, McqModelUpdate, client, collection, GetModule
 from fastapi_auth0 import Auth0, Auth0User
+from typing import *
 
 app = FastAPI()
-Base.metadata.create_all(engine)
 
 auth = Auth0(domain='bmcapi.jp.auth0.com', api_audience='bmcapi.jp-auth0.com',
              scopes={'read:users': 'create & edit mcqs'})
 
 
-class Grad(BaseModel):
-    stage: int
-    id: int
+@app.get('/mcq/{gd:int}/{smester:int}/{module:str}/', response_description="List Mcqs", response_model=list[McqModel])
+async def mcq_list(gd, smester, module):
+    mcq = collection.find({"Grade": gd, "Semesters": smester, "Modules": module})
+    list_mcq = list(mcq)
+    print(list_mcq)
+    return list_mcq
 
 
-class Sem(BaseModel):
-    seme: int
-    grade_id: int
-    id: int
+@app.get('/Modules', response_model=GetModule)
+def mod(mo: GetModule):
+    modules = collection.find({"Grade": mo.Grade, "Semesters": mo.Semester, "Modules": mo.Module})
+    list_m = list(modules)
+    modules = []
+    for doc in list_m:
+        module = doc['Modules']
+        modules.append({"Module": module})
 
-
-class Mo(BaseModel):
-    name: str
-    grade_id: int
-    semester_id: int
-    id: int
-
-
-class Mcq(BaseModel):
-    question: str
-    choice_A: str
-    choice_B: str
-    choice_C: str
-    choice_D: str
-    answer: str
-    module_id: int
-
-
-class Mcqd(BaseModel):
-    id: int
-
-
-class Umo(BaseModel):
-    grade_id: int
-    semester_id: int
-    module_id: int
-    module_name: str
-
-
-class Dmo(BaseModel):
-    id: int
-
-
-class Moc(BaseModel):
-    question: str
-    choice_A: str
-    choice_B: str
-    choice_C: str
-    choice_D: str
-    answer: str
-    module_id: int
-    mcq_id: int
-
-
-@app.get('/grade')
-def grade():
-    query = session.query(Grade).all()
-    print(query)
-    return 200, {'Response': 'OK', 'Grades': query}
-
-
-@app.post('/grade/add', dependencies=[Depends(auth.implicit_scheme)])
-def grade_add(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
-    new = Grade(stage=grad.stage)
-    Grade.insert(new)
-    return 201, {'Response': 'OK', 'User': user}
-
-
-@app.delete('/grade/delete')
-def gd_delete(grad: Grad, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
-    session.query(Grade).filter_by(id=grad.id).delete()
-    session.commit()
-    return 205, {'Response': 'OK'}
-
-
-@app.get('/semesters')
-def semesters():
-    query = session.query(Semesters).all()
-    print(query)
-    return 200, {'Response': 'OK', 'Semesters': query}
-
-
-@app.post('/semesters/add/', dependencies=[Depends(auth.implicit_scheme)])
-def grade_add(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
-    new = Semesters(num=seme.seme, grade_id=seme.grade_id)
-    Semesters.insert(new)
-    return 201, {'Response': 'OK'}
-
-
-@app.delete('/semesters/delete/', dependencies=[Depends(auth.implicit_scheme)])
-def sem_delete(seme: Sem, user: Auth0User = Security(auth.get_user), scopes=['read:users']):
-    session.query(Semesters).filter_by(id=seme.id).delete()
-    session.commit()
-    return 205, {'Response': 'OK'}
-
-
-@app.get('/Modules')
-def mod():
-    qu = session.query(Modules).all()
-    return 200, {'Response': 'OK', 'Modules': qu}
+    return modules
 
 
 @app.post("/Module/add", dependencies=[Depends(auth.implicit_scheme)])
